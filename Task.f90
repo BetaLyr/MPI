@@ -73,6 +73,39 @@ contains
 
         end do
 
+        !Размер буфера равен числу процессов.Каждый процесс запишет туда свою max_sum.
+        if( mpiRank == 0 ) then 
+
+            allocate( max_subA(0:mpiSize-1) )
+
+        endif
+
+        !Все процессы посылают процессу 0 max_sum.
+        call mpi_gather( max_sum, 1, MPI_REAL8, max_subA, 1 , MPI_REAL8, 0, MPI_COMM_WORLD, mpiErr )
+
+        !Ищет процесс с максимальным значением max_sum.
+        if( mpiRank == 0 ) then
+
+            numRank_max_subA = maxloc( max_subA, 1 ) - 1
+
+        endif
+
+        !Оповещение остальных участников игры о победителе.
+        call mpi_bcast( numRank_max_subA, 1, MPI_REAL8, 0, MPI_COMM_WORLD, mpiErr )
+
+        !Рассылка результата от numRank_max_subA всем процессам.
+        call mpi_bcast( x1, 1, MPI_REAL8, numRank_max_subA, MPI_COMM_WORLD, mpiErr )
+        call mpi_bcast( y1, 1, MPI_REAL8, numRank_max_subA, MPI_COMM_WORLD, mpiErr )
+
+        call mpi_bcast( x2, 1, MPI_REAL8, numRank_max_subA, MPI_COMM_WORLD, mpiErr )
+        call mpi_bcast( y2, 1, MPI_REAL8, numRank_max_subA, MPI_COMM_WORLD, mpiErr )
+
+        if( mpiRank == 0 ) then
+
+            deallocate( max_subA )
+
+        endif
+
         deallocate( current_line )
 
     END SUBROUTINE GetMaxCoordinates
