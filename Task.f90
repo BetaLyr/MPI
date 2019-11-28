@@ -17,6 +17,13 @@ contains
     real(8) current_sum                       !Хранит промежуточную сумму.
     real(8) max_sum                           !Максимальная сумма.
 
+    !Переменные, связанные с MPI.
+    integer(4) mpiErr                              !Код ошибки.
+    integer(4) mpiSize                             !Размер коммуникатора - число процессов в нем.
+    integer(4) mpiRank                             !Номер процесса в коммуникаторе.
+    real(8), allocatable, dimension(:) :: max_subA !Хранит в себе копии max_sum от каждого процесса.
+    integer(4) numRank_max_subA                    !Позиция наибольшего элемента в max_subA.
+
         n = size( A, dim = 2 )
         m = size( A, dim = 1 )
 
