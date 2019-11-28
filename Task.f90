@@ -24,6 +24,9 @@ contains
     real(8), allocatable, dimension(:) :: max_subA !Хранит в себе копии max_sum от каждого процесса.
     integer(4) numRank_max_subA                    !Позиция наибольшего элемента в max_subA.
 
+        call MPI_COMM_SIZE( MPI_COMM_WORLD, mpiSize, mpiErr ) !Дает число процессов в коммуникаторе.
+        call MPI_COMM_RANK( MPI_COMM_WORLD, mpiRank, mpiErr ) !Дает номер процесса в коммуникаторе.
+
         n = size( A, dim = 2 )
         m = size( A, dim = 1 )
 
@@ -37,8 +40,8 @@ contains
         x2 = 1
         y2 = 1
 
-        !Проходит по строкам.
-        do Up = 1, n
+        !Проходит по строкам. Разделяет итерации между процессами.
+        do Up = mpiRank+1, n, mpiSize
 
             current_line = A(:,Up)
 
